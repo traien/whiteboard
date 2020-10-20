@@ -32,7 +32,6 @@ if (urlParams.get("whiteboardid") !== whiteboardId) {
     urlParams.set("whiteboardid", whiteboardId);
     window.location.search = urlParams;
 }
-
 const myUsername = urlParams.get("username") || "unknown" + (Math.random() + "").substring(2, 6);
 const accessToken = urlParams.get("accesstoken") || "";
 
@@ -140,6 +139,32 @@ function showBasicAlert(html, newOptions) {
     }
 }
 
+function saveImageToFile(imgData) {
+    document.write(imgData);
+    //     const savingDir = path.join("./public/uploads", whiteboardId);
+    //     const filename = `${whiteboardId}_main.png`;
+    //     fs.ensureDir(savingDir, function (err) {
+    //         if (err) {
+    //             console.log("Could not create upload folder!", err);
+    //         }
+    //         imgData = imgData
+    //             .replace(/^data:image\/png;base64,/, "")
+    //             .replace(/^data:image\/jpeg;base64,/, "");
+    //         const savingPath = path.join(savingDir, filename);
+    //         fs.writeFile(savingPath, imgData, "base64", function (err) {
+    //             if (err) {
+    //                 console.log("error", err);
+    //                 callback(err);
+    //             } else {
+    //                 console.log(filename, "uploaded");
+    //             }
+    //         });
+    //     });
+    //     fs.writeFile('image.png', imgData, {encoding: 'base64'}, function(err) {
+    //         console.log('File created');
+    //     });
+}
+
 function initWhiteboard() {
     $(document).ready(function () {
         // by default set in readOnly mode
@@ -210,7 +235,6 @@ function initWhiteboard() {
             } else if (e.which == 17) {
                 strgPressed = true;
             }
-            //console.log(e.which);
         });
         $(document).on("keyup", function (e) {
             if (e.which == 16) {
@@ -328,6 +352,7 @@ function initWhiteboard() {
                             //FireFox seems to require a setTimeout for this to work.
                             var a = document.createElement("a");
                             a.href = imgData;
+                            console.log(imgData);
                             a.download = "whiteboard." + ConfigService.imageDownloadFormat;
                             w.document.body.appendChild(a);
                             a.click();
@@ -659,6 +684,7 @@ function initWhiteboard() {
                                     dom.i2svg();
 
                                     showPDFPageAsImage(1);
+
                                     function showPDFPageAsImage(pageNumber) {
                                         // Fetch the page
                                         pdf.getPage(pageNumber).then(function (page) {
@@ -737,7 +763,17 @@ function initWhiteboard() {
             dragCounter = 0;
             whiteboard.dropIndicator.hide();
         });
-
+        window.addEventListener("message", (event) => {
+            whiteboard.getImageDataBase64(
+                {
+                    imageFormat: ConfigService.imageDownloadFormat,
+                    drawBackgroundGrid: ConfigService.drawBackgroundGrid,
+                },
+                function (imgData) {
+                    parent.postMessage(imgData);
+                }
+            );
+        });
         new Picker({
             parent: $("#whiteboardColorpicker")[0],
             color: "#000000",
@@ -765,6 +801,19 @@ function initWhiteboard() {
 
         // In any case, if we are on read-only whiteboard we activate read-only mode
         if (ConfigService.isReadOnly) ReadOnlyService.activateReadOnlyMode();
+
+        if (urlParams.get("getImage") === "true") {
+            const imgData = whiteboard.getImageDataBase64(
+                {
+                    imageFormat: ConfigService.imageDownloadFormat,
+                    drawBackgroundGrid: ConfigService.drawBackgroundGrid,
+                },
+                function (x) {
+                    window.parent.generateGuid();
+                    // saveImageToFile(x);
+                }
+            );
+        }
     });
 
     //Prevent site from changing tab on drag&drop
