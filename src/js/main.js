@@ -352,7 +352,6 @@ function initWhiteboard() {
                             //FireFox seems to require a setTimeout for this to work.
                             var a = document.createElement("a");
                             a.href = imgData;
-                            console.log(imgData);
                             a.download = "whiteboard." + ConfigService.imageDownloadFormat;
                             w.document.body.appendChild(a);
                             a.click();
@@ -764,8 +763,6 @@ function initWhiteboard() {
             whiteboard.dropIndicator.hide();
         });
         window.addEventListener("message", (event) => {
-            console.log("recieed");
-            console.log(event.data);
             whiteboard.getImageDataBase64(
                 {
                     imageFormat: ConfigService.imageDownloadFormat,
