@@ -765,13 +765,14 @@ function initWhiteboard() {
         });
         window.addEventListener("message", (event) => {
             console.log("recieed");
+            console.log(event.data);
             whiteboard.getImageDataBase64(
                 {
                     imageFormat: ConfigService.imageDownloadFormat,
                     drawBackgroundGrid: ConfigService.drawBackgroundGrid,
                 },
                 function (imgData) {
-                    parent.postMessage(imgData);
+                    parent.postMessage(imgData, event.data);
                 }
             );
         });
