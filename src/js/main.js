@@ -764,6 +764,7 @@ function initWhiteboard() {
             whiteboard.dropIndicator.hide();
         });
         window.addEventListener("message", (event) => {
+            console.log("recieed");
             whiteboard.getImageDataBase64(
                 {
                     imageFormat: ConfigService.imageDownloadFormat,
